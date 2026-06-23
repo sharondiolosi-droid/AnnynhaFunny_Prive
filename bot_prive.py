@@ -562,6 +562,20 @@ async def button(update, context):
 # MAIN
 # ????????????????????????????????????????????????????????????????
 
+async def suporte(update, context):
+    text = (
+        "?? *SUPORTE AnnynhaFunny_PriveBot*\n"
+        "??????????????????????\n\n"
+        "?? *WhatsApp:* +5511940462611\n"
+        "?? *Email:* suporte@annynhafunny.com\n"
+        "?? *Telegram:* @AnynhaFunny_PriveBot\n\n"
+        "?? *Hor?rio de atendimento:*\n"
+        "Segunda a Sexta: 09:00 - 18:00\n"
+        "S?bado: 09:00 - 14:00\n\n"
+        "?? *Atendimento humanizado e r?pido!*"
+    )
+    await update.message.reply_text(text, parse_mode=ParseMode.MARKDOWN)
+
 async def main_async():
     print("=" * 60)
     print("?? AnnynhaFunny_PriveBot - Iniciando...")
@@ -582,6 +596,7 @@ async def main_async():
     app.add_handler(CommandHandler("drop_all", drop_all))
     app.add_handler(CommandHandler("relatorio", relatorio))
     app.add_handler(CommandHandler("modelos", listar_modelos))
+    app.add_handler(CommandHandler("suporte", suporte))
 
     # Handlers
     app.add_handler(CallbackQueryHandler(button))
@@ -606,3 +621,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
