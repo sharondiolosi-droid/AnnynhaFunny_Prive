@@ -1,7 +1,26 @@
-﻿__pycache__/
+﻿@"
+# Python
+__pycache__/
 *.pyc
+*.pyo
+*.pyd
+
+# Banco de dados
 *.db
+*.sqlite
+*.sqlite3
+
+# Variáveis de ambiente
 .env
 .env.local
+.env.*.local
+
+# IDE
 .vscode/
 .idea/
+*.swp
+*.swo
+
+# Railway
+*.log
+"@ | Out-File -FilePath .gitignore -Encoding utf8
