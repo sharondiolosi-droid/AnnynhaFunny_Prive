@@ -1,7 +1,6 @@
-@"
 """
 ===============================================
-AnnynhaFunny_PriveBot - Configurações
+AnnynhaFunny_PriveBot - Configura??es
 ===============================================
 """
 
@@ -13,7 +12,7 @@ load_dotenv()
 # Token do Bot
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN_PRIVE")
 
-# Admin (seu ID) - separados por vírgula
+# Admin (seu ID) - separados por v?rgula
 try:
     ADMIN_CHAT_IDS = [int(x.strip()) for x in os.getenv("ADMIN_CHAT_IDS", "0").split(",") if x.strip()]
 except ValueError:
@@ -22,7 +21,7 @@ except ValueError:
 # Banco de dados
 DATABASE_PATH = "prive_bot.db"
 
-# Preços padrão
+# Pre?os padr?o
 PRECO_FAN = 29.90
 PRECO_VIP = 79.90
 PRECO_PRIVE = 299.90
@@ -34,5 +33,4 @@ PREFIXO_VIP = "_VIP"
 PREFIXO_PRIVE = "_Prive"
 
 # Drops
-DROP_DURATION_HOURS = 48  # Tempo que o drop fica visível
-"@ | Out-File -FilePath config_prive.py -Encoding utf8
+DROP_DURATION_HOURS = 48

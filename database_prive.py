@@ -1,4 +1,3 @@
-@"
 """
 ===============================================
 AnnynhaFunny_PriveBot - Banco de Dados
@@ -19,8 +18,7 @@ def get_connection():
 def init_db():
     conn = get_connection()
     cursor = conn.cursor()
-    
-    # Tabela de modelos
+
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS modelos (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -37,8 +35,7 @@ def init_db():
             ativo BOOLEAN DEFAULT 1
         )
     """)
-    
-    # Tabela de drops
+
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS drops (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -53,8 +50,7 @@ def init_db():
             FOREIGN KEY (modelo_id) REFERENCES modelos(id)
         )
     """)
-    
-    # Tabela de assinantes
+
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS assinantes (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -67,36 +63,34 @@ def init_db():
             FOREIGN KEY (modelo_id) REFERENCES modelos(id)
         )
     """)
-    
+
     conn.commit()
     conn.close()
 
-# ────────────────────────────────────────────
+# ????????????????????????????????????????????
 # MODELOS
-# ────────────────────────────────────────────
+# ????????????????????????????????????????????
 
 def add_modelo(username, nome_completo, preco_fan=29.90, preco_vip=79.90, preco_prive=299.90):
-    """Adiciona uma nova modelo ao sistema."""
     conn = get_connection()
     cursor = conn.cursor()
-    
-    # Gera os nomes dos canais
+
     canal_free = f"@{username}{PREFIXO_FREE}"
     canal_fan = f"@{username}{PREFIXO_FAN}"
     canal_vip = f"@{username}{PREFIXO_VIP}"
     canal_prive = f"@{username}{PREFIXO_PRIVE}"
-    
+
     cursor.execute("""
         INSERT INTO modelos (username, nome_completo, canal_free, canal_fan, canal_vip, canal_prive,
                             preco_fan, preco_vip, preco_prive)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, (username, nome_completo, canal_free, canal_fan, canal_vip, canal_prive,
           preco_fan, preco_vip, preco_prive))
-    
+
     conn.commit()
     modelo_id = cursor.lastrowid
     conn.close()
-    
+
     return {
         "id": modelo_id,
         "username": username,
@@ -108,7 +102,6 @@ def add_modelo(username, nome_completo, preco_fan=29.90, preco_vip=79.90, preco_
     }
 
 def get_modelos():
-    """Retorna todas as modelos ativas."""
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM modelos WHERE ativo = 1 ORDER BY id")
@@ -117,7 +110,6 @@ def get_modelos():
     return [dict(r) for r in rows]
 
 def get_modelo_by_username(username):
-    """Busca modelo pelo username."""
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM modelos WHERE username = ? AND ativo = 1", (username,))
@@ -126,7 +118,6 @@ def get_modelo_by_username(username):
     return dict(row) if row else None
 
 def get_modelo_by_id(modelo_id):
-    """Busca modelo pelo ID."""
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM modelos WHERE id = ? AND ativo = 1", (modelo_id,))
@@ -134,87 +125,82 @@ def get_modelo_by_id(modelo_id):
     conn.close()
     return dict(row) if row else None
 
-# ────────────────────────────────────────────
+# ????????????????????????????????????????????
 # DROPS
-# ────────────────────────────────────────────
+# ????????????????????????????????????????????
 
 def add_drop(modelo_id, canal_tipo, file_id, tipo_midia, caption="", expira_horas=48):
-    """Registra um novo drop."""
     conn = get_connection()
     cursor = conn.cursor()
-    
+
     expira_em = datetime.now() + timedelta(hours=expira_horas)
-    
+
     cursor.execute("""
         INSERT INTO drops (modelo_id, canal_tipo, file_id, tipo_midia, caption, expira_em)
         VALUES (?, ?, ?, ?, ?, ?)
     """, (modelo_id, canal_tipo, file_id, tipo_midia, caption, expira_em.isoformat()))
-    
+
     conn.commit()
     drop_id = cursor.lastrowid
     conn.close()
     return drop_id
 
 def get_drops(modelo_id, canal_tipo):
-    """Retorna drops de uma modelo/canal."""
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("""
-        SELECT * FROM drops 
-        WHERE modelo_id = ? AND canal_tipo = ? 
+        SELECT * FROM drops
+        WHERE modelo_id = ? AND canal_tipo = ?
         ORDER BY criado_em DESC LIMIT 10
     """, (modelo_id, canal_tipo))
     rows = cursor.fetchall()
     conn.close()
     return [dict(r) for r in rows]
 
-# ────────────────────────────────────────────
+# ????????????????????????????????????????????
 # ASSINANTES
-# ────────────────────────────────────────────
+# ????????????????????????????????????????????
 
 def add_assinante(telegram_id, modelo_id, plano, expira_dias=30):
-    """Adiciona um novo assinante."""
     conn = get_connection()
     cursor = conn.cursor()
-    
+
     expira_em = datetime.now() + timedelta(days=expira_dias)
-    
+
     cursor.execute("""
         INSERT INTO assinantes (telegram_id, modelo_id, plano, expira_em)
         VALUES (?, ?, ?, ?)
     """, (telegram_id, modelo_id, plano, expira_em.isoformat()))
-    
+
     conn.commit()
     assinante_id = cursor.lastrowid
     conn.close()
     return assinante_id
 
 def get_assinantes(modelo_id, plano=None):
-    """Retorna assinantes de uma modelo."""
     conn = get_connection()
     cursor = conn.cursor()
-    
+
     if plano:
         cursor.execute("""
-            SELECT * FROM assinantes 
+            SELECT * FROM assinantes
             WHERE modelo_id = ? AND plano = ? AND ativo = 1
         """, (modelo_id, plano))
     else:
         cursor.execute("""
-            SELECT * FROM assinantes 
+            SELECT * FROM assinantes
             WHERE modelo_id = ? AND ativo = 1
         """, (modelo_id,))
-    
+
     rows = cursor.fetchall()
     conn.close()
     return [dict(r) for r in rows]
 
 def get_assinante(telegram_id, modelo_id):
-    """Verifica se um usuário é assinante de uma modelo."""
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("""
-        SELECT * FROM assinantes 
+        SELECT * FROM assinantes
         WHERE telegram_id = ? AND modelo_id = ? AND ativo = 1
     """, (telegram_id, modelo_id))
     row = cursor.fetchone()
@@ -222,30 +208,27 @@ def get_assinante(telegram_id, modelo_id):
     return dict(row) if row else None
 
 def renovar_assinante(assinante_id, dias=30):
-    """Renova uma assinatura."""
     conn = get_connection()
     cursor = conn.cursor()
-    
+
     nova_expira = datetime.now() + timedelta(days=dias)
-    
+
     cursor.execute("""
-        UPDATE assinantes 
-        SET expira_em = ?, ativo = 1 
+        UPDATE assinantes
+        SET expira_em = ?, ativo = 1
         WHERE id = ?
     """, (nova_expira.isoformat(), assinante_id))
-    
+
     conn.commit()
     conn.close()
 
 def cancelar_assinante(assinante_id):
-    """Cancela uma assinatura."""
     conn = get_connection()
     cursor = conn.cursor()
-    
+
     cursor.execute("""
         UPDATE assinantes SET ativo = 0 WHERE id = ?
     """, (assinante_id,))
-    
+
     conn.commit()
     conn.close()
-"@ | Out-File -FilePath database_prive.py -Encoding utf8
